@@ -13,7 +13,6 @@ The network is made up of 8 routers with a single host each. each router has a n
 
 ![netTop](https://github.com/user-attachments/assets/b7cd55a8-4570-4e9e-bffc-7f45962de452)
 
-
 ---
 
 ## Task 1
@@ -131,6 +130,8 @@ Also the host will need a default gateway set to ip of the router. this is done 
 ./goto LOND host
 ip route add default via 77.101.0.2 dev LONDrouter
 ```
+
+The reason for this is that the host needs to know where to send packets that are not on the same subnet. Becase by default the host cant reach the routers loop back interface as it is on a different subnet. This will allow the host to reach the loopback interface.
 
 ### Verification
 
