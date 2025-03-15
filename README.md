@@ -258,6 +258,13 @@ first ssh into the router
 ```
 
 next configure the OSPF process. the router id will be the loopback interface ip address. the area id will be `0` or `0.0.0.0` for all routers. the networks to advertise will be all interfaces on the router including host, and link networks, loopback will be done via `redistrabute conected`.
+\
+Also this will enbale the `DNS server` on LOND router (once `OSPF` is enabled and configured on the LOND router), this is done with the `redisribute connected` so no manual configuration is needed. this will enable forward and reverse DNS lookups for anoyone in the network for commands such as `ping`, `traceroute`, and `iperf3`. Thus the following steps insted of ips can be hostnames the following pattern is used:
+
+- `host.{placename}.group{ASnumber}` -- for hosts
+- `{placename}.group{ASnumber}` -- for routers
+
+thus for me its `host.LOND.group77` for `LOND host` and `LOND.group77` for `LOND router`. This could convert `77.0.2.1` to `host.HAML.group77` and `77.152.0.1` to `HAML.group77`.
 
 ```bash
 configure terminal
