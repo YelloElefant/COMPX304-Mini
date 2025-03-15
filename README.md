@@ -11,7 +11,8 @@ The network is made up of 8 routers with a single host each. each router has a n
 
 ## Topology
 
-![netTop](NetworkTopology.png)
+![netTop](https://github.com/user-attachments/assets/b7cd55a8-4570-4e9e-bffc-7f45962de452)
+
 
 ---
 
