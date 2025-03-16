@@ -240,7 +240,6 @@ Set up OSPF on all routers. once done all routers should be able to ping each ot
 
 for example LOND has the following networks to advertise:
 
-- `77.101.0.0/24` -- host network
 - `77.151.0.1/32` -- loopback interface _\*\* this will be advertised by redistribute conected_
 - `77.0.2.0/30` -- to HAML
 - `77.0.4.0/30` -- to PARI
@@ -270,7 +269,6 @@ thus for me its `host.LOND.group77` for `LOND host` and `LOND.group77` for `LOND
 configure terminal
 router ospf
 router-id 77.151.0.1
-network 77.101.0.0/24 # host network
 network 77.0.2.0/30 # to HAML
 network 77.0.4.0/30 # to PARI
 network 77.0.8.0/30 # to NEWY
