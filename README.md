@@ -170,7 +170,7 @@ _this example will be done with a pair of routers LOND and BOST_
 
 #### Example for router LOND -- Y = 1 and BOST -- Y = 6
 
-for LOND, this will add the ip and mask to the interface `port_BOST` which is the interface that connects to BOST. the ip address will be `77.0.7.1/30` and for BOST, this will add the ip and mask to the interface `port_LOND` which is the interface that connects to LOND. the ip address will be `
+for LOND, this will add the ip and mask to the interface `port_BOST` which is the interface that connects to BOST, the ip address will be `77.0.7.1/30`, and for BOST this will add the ip and mask to the interface `port_LOND` which is the interface that connects to LOND. the ip address will be `77.0.7.2/30`.
 
 ```bash
 ./goto LOND
@@ -236,7 +236,7 @@ Set up OSPF on all routers. once done all routers should be able to ping each ot
 
 - Router ID -- `this will be the loopback interface ip address as this is unique`
 - Area ID -- `0 or 0.0.0.0 for all routers for backbone area`
-- List of networks to advertise -- `all interfaces on the router including loopback, host, and link networks`
+- List of networks to advertise -- `all interfaces on the router including loopback, and link networks` _(will come back to the host network later as it needs other config)_
 
 for example LOND has the following networks to advertise:
 
@@ -269,11 +269,11 @@ thus for me its `host.LOND.group77` for `LOND host` and `LOND.group77` for `LOND
 configure terminal
 router ospf
 router-id 77.151.0.1
-network 77.0.2.0/30 # to HAML
-network 77.0.4.0/30 # to PARI
-network 77.0.8.0/30 # to NEWY
-network 77.0.7.0/30 # to BOST
-redistribute connected # loopback interface and all directly connected networks will be advertised
+network 77.0.2.0/30 area 0  # to HAML
+network 77.0.4.0/30 area 0 # to PARI
+network 77.0.8.0/30 area 0 # to NEWY
+network 77.0.7.0/30 area 0 # to BOST
+redistribute connected # loopback interface and all directly connected networks will be advertised as external routes
 ```
 
 redo the above steps for all routers.
@@ -408,10 +408,10 @@ rtt min/avg/max/mdev = 0.033/0.035/0.038/0.002 ms
 -------------------------
 Pinging 77.102.0.1...
 PING 77.102.0.1 (77.102.0.1) 56(84) bytes of data.
-64 bytes from 77.102.0.1: icmp_seq=1 ttl=61 time=1.33 ms
-64 bytes from 77.102.0.1: icmp_seq=2 ttl=61 time=1.27 ms
-64 bytes from 77.102.0.1: icmp_seq=3 ttl=61 time=1.34 ms
-64 bytes from 77.102.0.1: icmp_seq=4 ttl=61 time=1.34 ms
+64 bytes from 77.102.0.1: icmp_seq=1 ttl=62 time=1.33 ms
+64 bytes from 77.102.0.1: icmp_seq=2 ttl=62 time=1.27 ms
+64 bytes from 77.102.0.1: icmp_seq=3 ttl=62 time=1.34 ms
+64 bytes from 77.102.0.1: icmp_seq=4 ttl=62 time=1.34 ms
 
 --- 77.102.0.1 ping statistics ---
 4 packets transmitted, 4 received, 0% packet loss, time 3027ms
@@ -421,7 +421,7 @@ Pinging 77.103.0.1...
 PING 77.103.0.1 (77.103.0.1) 56(84) bytes of data.
 64 bytes from 77.103.0.1: icmp_seq=1 ttl=62 time=0.165 ms
 64 bytes from 77.103.0.1: icmp_seq=2 ttl=62 time=0.145 ms
-64 bytes from 77.103.0.1: icmp_seq=3 ttl=62 time=0.161 ms
+64 bytes from 77.103.0.1: icmp_seq=3 ttl=62 time=0.162 ms
 64 bytes from 77.103.0.1: icmp_seq=4 ttl=62 time=0.140 ms
 
 --- 77.103.0.1 ping statistics ---
@@ -430,10 +430,10 @@ rtt min/avg/max/mdev = 0.140/0.152/0.165/0.010 ms
 -------------------------
 Pinging 77.104.0.1...
 PING 77.104.0.1 (77.104.0.1) 56(84) bytes of data.
-64 bytes from 77.104.0.1: icmp_seq=1 ttl=61 time=0.226 ms
-64 bytes from 77.104.0.1: icmp_seq=2 ttl=61 time=0.223 ms
-64 bytes from 77.104.0.1: icmp_seq=3 ttl=61 time=0.222 ms
-64 bytes from 77.104.0.1: icmp_seq=4 ttl=61 time=0.234 ms
+64 bytes from 77.104.0.1: icmp_seq=1 ttl=62 time=0.226 ms
+64 bytes from 77.104.0.1: icmp_seq=2 ttl=62 time=0.223 ms
+64 bytes from 77.104.0.1: icmp_seq=3 ttl=62 time=0.222 ms
+64 bytes from 77.104.0.1: icmp_seq=4 ttl=62 time=0.234 ms
 
 --- 77.104.0.1 ping statistics ---
 4 packets transmitted, 4 received, 0% packet loss, time 3091ms
@@ -452,10 +452,15 @@ rtt min/avg/max/mdev = 0.302/0.331/0.365/0.026 ms
 -------------------------
 Pinging 77.106.0.1...
 PING 77.106.0.1 (77.106.0.1) 56(84) bytes of data.
-64 bytes from 77.106.0.1: icmp_seq=1 ttl=61 time=0.372 ms
-64 bytes from 77.106.0.1: icmp_seq=2 ttl=61 time=0.358 ms
-64 bytes from 77.106.0.1: icmp_seq=3 ttl=61 time=0.361 ms
-64 bytes from 77.106.0.1: icmp_seq=4 ttl=61 time=0.384 ms
+64 bytes from 77.106.0.1: icmp_seq=1 ttl=62 time=20.4 ms
+64 bytes from 77.106.0.1: icmp_seq=2 ttl=62 time=20.5 ms
+64 bytes from 77.106.0.1: icmp_seq=3 ttl=62 time=20.3 ms
+64 bytes from 77.106.0.1: icmp_seq=4 ttl=62 time=20.4 ms
+
+--- 77.106.0.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3068ms
+rtt min/avg/max/mdev = 20.4/20.3/20.4/0.20 ms
+-------------------------
 
 --- 77.106.0.1 ping statistics ---
 4 packets transmitted, 4 received, 0% packet loss, time 3068ms
@@ -463,10 +468,10 @@ rtt min/avg/max/mdev = 0.358/0.368/0.384/0.010 ms
 -------------------------
 Pinging 77.107.0.1...
 PING 77.107.0.1 (77.107.0.1) 56(84) bytes of data.
-64 bytes from 77.107.0.1: icmp_seq=1 ttl=61 time=0.572 ms
-64 bytes from 77.107.0.1: icmp_seq=2 ttl=61 time=0.584 ms
-64 bytes from 77.107.0.1: icmp_seq=3 ttl=61 time=0.682 ms
-64 bytes from 77.107.0.1: icmp_seq=4 ttl=61 time=0.529 ms
+64 bytes from 77.107.0.1: icmp_seq=1 ttl=62 time=0.572 ms
+64 bytes from 77.107.0.1: icmp_seq=2 ttl=62 time=0.584 ms
+64 bytes from 77.107.0.1: icmp_seq=3 ttl=62 time=0.682 ms
+64 bytes from 77.107.0.1: icmp_seq=4 ttl=62 time=0.529 ms
 
 --- 77.107.0.1 ping statistics ---
 4 packets transmitted, 4 received, 0% packet loss, time 3059ms
@@ -474,10 +479,10 @@ rtt min/avg/max/mdev = 0.529/0.591/0.682/0.055 ms
 -------------------------
 Pinging 77.108.0.1...
 PING 77.108.0.1 (77.108.0.1) 56(84) bytes of data.
-64 bytes from 77.108.0.1: icmp_seq=1 ttl=61 time=0.396 ms
-64 bytes from 77.108.0.1: icmp_seq=2 ttl=61 time=0.334 ms
-64 bytes from 77.108.0.1: icmp_seq=3 ttl=61 time=0.333 ms
-64 bytes from 77.108.0.1: icmp_seq=4 ttl=61 time=0.336 ms
+64 bytes from 77.108.0.1: icmp_seq=1 ttl=62 time=0.396 ms
+64 bytes from 77.108.0.1: icmp_seq=2 ttl=62 time=0.334 ms
+64 bytes from 77.108.0.1: icmp_seq=3 ttl=62 time=0.333 ms
+64 bytes from 77.108.0.1: icmp_seq=4 ttl=62 time=0.336 ms
 
 --- 77.108.0.1 ping statistics ---
 4 packets transmitted, 4 received, 0% packet loss, time 3078ms
@@ -500,9 +505,29 @@ show ip ospf neighbor
 1. `database`
    - this will show the `OSPF` database on the router, this will show insite into the links and how networks are being advertised.
 2. `interface`
+
    - this will show the `OSPF` interfaces on the router, this will show the interfaces that are being used for `OSPF`. This is mainly used ensure that all interfaces are being used for `OSPF` and the Cost of each link.
+
+     ```bash
+     port_HAML is up
+     ifindex 30552, MTU 1500 bytes, BW 10000 Mbit <UP,BROADCAST,RUNNING,MULTICAST>
+     Internet Address 77.0.2.2/30, Broadcast 77.0.2.3, Area 0.0.0.0
+     MTU mismatch detection: enabled
+     Router ID 77.151.0.1, Network Type BROADCAST, Cost: 5
+     Transmit Delay is 1 sec, State DR, Priority 1
+     Designated Router (ID) 77.151.0.1 Interface Address 77.0.2.2/30
+     Backup Designated Router (ID) 77.152.0.1, Interface Address 77.0.2.1
+     Saved Network-LSA sequence number 0x80000398
+     Multicast group memberships: OSPFAllRouters OSPFDesignatedRouters
+     Timer intervals configured, Hello 10s, Dead 40s, Wait 40s, Retransmit 5
+     Hello due in 5.324s
+     Neighbor Count is 1, Adjacent neighbor count is 1
+     ```
+
+     For example this shows the port_HAML and tells you everything about it including the `OSPF` ID, the `Cost`, and the `State`. This is used to ensure that all interfaces are being used for `OSPF` and the Cost of each link. The cost is used to determine the best path to take to reach a destination. The lower the cost the better the path. pay close attention to the neighbor count and the adjacent neighbor count, this should be 1 for each link.
+
 3. `route`
-   - this will show all the routes the router knows about andthe first step needed to take (`first hop`), it will also show the cost of the `first hop`. You should be able to see all networks that you have set up as they should all be reachable.
+   - this will show all the routes the router knows about and the first step needed to take (`first hop`), it will also show the cost of the `first hop`. You should be able to see all networks that you have set up as they should all be reachable. This will show you external and internal networks that can be routed and routers that can be routed to.
 4. `neighbor`
 
    - this will show all the neighbors the router has. This is direct neighbors. You should be able to match the `OSPF ID` to the router on the diagram and the interface that they are conected on
@@ -515,3 +540,211 @@ show ip ospf neighbor
      For example this shows that LOND is connected to BOST on the interface `port_BOST` and the ip address `77.156.0.1` this is the loopback ip of BOST _(remember this is the `OSPF` ID of the router)_.
 
 repeat the above steps for all routers. this will ensure `OSPF` configuration is correct. This completes task 7.
+
+## Task 8
+
+### Objective
+
+Verify the hosts are not receiving OSPF packets
+
+### Configuration
+
+This is done by running the `tcpdump` command on the host. This will show all packets that are being sent to the host. This will show if the host is receiving `OSPF` packets or not. This is done by running the following command:
+
+```bash
+./goto LOND host
+tcpdump -i LONDrouter -n -e -s 0 -c 10 'ip[9] == 89'
+```
+
+This should output nothing but if you see this
+
+```bash
+09:13:37.456989 IP (tos 0xc0, ttl 1, id 53489, offset 0, flags [none], proto OSPF (89), length 64)
+    lond.group77 > 224.0.0.5: OSPFv2, Hello, length 44
+        Router-ID lond.group77, Backbone Area, Authentication Type: none (0)
+        Options [External]
+          Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+          Designated Router lond.group77
+```
+
+This means that the host is receiving `OSPF` packets and is not configured correctly. This should not be the case as the host should not be receiving `OSPF` packets. This is most likely due to the host network being advertised in `OSPF` simply remove the host network from the `OSPF` configuration on the router. This is done by running the following command:
+
+```bash
+./goto LOND
+configure terminal
+router ospf
+no network 77.101.0.0/24 area 0
+```
+
+This will remove the host network from the `OSPF` configuration on the router. This will stop the host from receiving `OSPF` packets. This is done for all routers. This completes task 8.
+
+## Task 9-10
+
+### Objective
+
+Testing the network to find high latency or low bandwidth links. This is done by running a series of tests to see if the network is working correctly. Tests will be done between hosts. The tests will be as follows:
+
+- Test latency with `ping` between hosts
+- Test bandwidth with `iperf3` between hosts
+
+### Configuration
+
+This can be done exacly the same as 5 and 6 using mping.sh using the same host list as before too:
+
+```bash
+./goto LOND host
+bash ./mping.sh $(cat hosts)
+```
+
+```bash
+## output:
+LOND_host:~# bash ./mping.sh $(cat hosts)
+Pinging 77.101.0.1...
+PING 77.101.0.1 (77.101.0.1) 56(84) bytes of data.
+64 bytes from 77.101.0.1: icmp_seq=1 ttl=64 time=0.033 ms
+64 bytes from 77.101.0.1: icmp_seq=2 ttl=64 time=0.035 ms
+64 bytes from 77.101.0.1: icmp_seq=3 ttl=64 time=0.037 ms
+64 bytes from 77.101.0.1: icmp_seq=4 ttl=64 time=0.038 ms
+
+--- 77.101.0.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3069ms
+rtt min/avg/max/mdev = 0.033/0.035/0.038/0.002 ms
+-------------------------
+Pinging 77.102.0.1...
+PING 77.102.0.1 (77.102.0.1) 56(84) bytes of data.
+64 bytes from 77.102.0.1: icmp_seq=1 ttl=62 time=1.33 ms
+64 bytes from 77.102.0.1: icmp_seq=2 ttl=62 time=1.27 ms
+64 bytes from 77.102.0.1: icmp_seq=3 ttl=62 time=1.34 ms
+64 bytes from 77.102.0.1: icmp_seq=4 ttl=62 time=1.34 ms
+
+--- 77.102.0.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3027ms
+rtt min/avg/max/mdev = 1.269/1.321/1.344/0.030 ms
+-------------------------
+Pinging 77.103.0.1...
+PING 77.103.0.1 (77.103.0.1) 56(84) bytes of data.
+64 bytes from 77.103.0.1: icmp_seq=1 ttl=62 time=0.165 ms
+64 bytes from 77.103.0.1: icmp_seq=2 ttl=62 time=0.145 ms
+64 bytes from 77.103.0.1: icmp_seq=3 ttl=62 time=0.162 ms
+64 bytes from 77.103.0.1: icmp_seq=4 ttl=62 time=0.140 ms
+
+--- 77.103.0.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3085ms
+rtt min/avg/max/mdev = 0.140/0.152/0.165/0.010 ms
+-------------------------
+Pinging 77.104.0.1...
+PING 77.104.0.1 (77.104.0.1) 56(84) bytes of data.
+64 bytes from 77.104.0.1: icmp_seq=1 ttl=62 time=0.226 ms
+64 bytes from 77.104.0.1: icmp_seq=2 ttl=62 time=0.223 ms
+64 bytes from 77.104.0.1: icmp_seq=3 ttl=62 time=0.222 ms
+64 bytes from 77.104.0.1: icmp_seq=4 ttl=62 time=0.234 ms
+
+--- 77.104.0.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3091ms
+rtt min/avg/max/mdev = 0.222/0.226/0.234/0.004 ms
+-------------------------
+Pinging 77.105.0.1...
+PING 77.105.0.1 (77.105.0.1) 56(84) bytes of data.
+64 bytes from 77.105.0.1: icmp_seq=1 ttl=62 time=0.365 ms
+64 bytes from 77.105.0.1: icmp_seq=2 ttl=62 time=0.349 ms
+64 bytes from 77.105.0.1: icmp_seq=3 ttl=62 time=0.302 ms
+64 bytes from 77.105.0.1: icmp_seq=4 ttl=62 time=0.309 ms
+
+--- 77.105.0.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3063ms
+rtt min/avg/max/mdev = 0.302/0.331/0.365/0.026 ms
+-------------------------
+Pinging 77.106.0.1...
+PING 77.106.0.1 (77.106.0.1) 56(84) bytes of data.
+64 bytes from 77.106.0.1: icmp_seq=1 ttl=62 time=20.4 ms
+64 bytes from 77.106.0.1: icmp_seq=2 ttl=62 time=20.5 ms
+64 bytes from 77.106.0.1: icmp_seq=3 ttl=62 time=20.3 ms
+64 bytes from 77.106.0.1: icmp_seq=4 ttl=62 time=20.4 ms
+
+--- 77.106.0.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3068ms
+rtt min/avg/max/mdev = 20.4/20.3/20.4/0.20 ms
+-------------------------
+Pinging 77.107.0.1...
+PING 77.107.0.1 (77.107.0.1) 56(84) bytes of data.
+64 bytes from 77.107.0.1: icmp_seq=1 ttl=62 time=0.572 ms
+64 bytes from 77.107.0.1: icmp_seq=2 ttl=62 time=0.584 ms
+64 bytes from 77.107.0.1: icmp_seq=3 ttl=62 time=0.682 ms
+64 bytes from 77.107.0.1: icmp_seq=4 ttl=62 time=0.529 ms
+
+--- 77.107.0.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3059ms
+rtt min/avg/max/mdev = 0.529/0.591/0.682/0.055 ms
+-------------------------
+Pinging 77.108.0.1...
+PING 77.108.0.1 (77.108.0.1) 56(84) bytes of data.
+64 bytes from 77.108.0.1: icmp_seq=1 ttl=62 time=0.396 ms
+64 bytes from 77.108.0.1: icmp_seq=2 ttl=62 time=0.334 ms
+64 bytes from 77.108.0.1: icmp_seq=3 ttl=62 time=0.333 ms
+64 bytes from 77.108.0.1: icmp_seq=4 ttl=62 time=0.336 ms
+
+--- 77.108.0.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3078ms
+rtt min/avg/max/mdev = 0.333/0.349/0.396/0.026 ms
+-------------------------
+```
+
+However we will look at the latency of the links notice how the `LOND -> BOST` has a high latency that will be important.
+\
+Now do `iperf3` between hosts. This will show the bandwidth between the hosts. However this doesnt have a easy script just yet and will have to be done manually, but because
+
+```math
+\binom{8}{2} = \frac{8!}{2!(8-2)!} = \frac{8 \cdot 7}{2 \cdot 1} = 28
+```
+
+This means we only have to run 28 tests instead of 56. This is done by running the following command on each host:
+\
+_This example done with LOND host and BOST host_
+
+```bash
+./goto LOND host
+iperf3 -s
+```
+
+this runs server on LOND host. Now run the following command on BOST host:
+
+```bash
+./goto BOST host
+iperf3 -c 77.101.0.1
+```
+
+```bash
+## output:
+BOST_host:~# iperf3 -c 77.101.0.1
+Connecting to host 77.101.0.1, port 5201
+[  5] local 77.106.0.1 port 45422 connected to 77.101.0.1 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  12.75 MBytes  107 Mbits/sec    0    308 KBytes
+[  5]   1.00-2.00   sec  12.88 MBytes  108 Mbits/sec    0    368 KBytes
+[  5]   2.00-3.00   sec  12.62 MBytes  106 Mbits/sec    0    426 KBytes
+[  5]   3.00-4.00   sec  12.75 MBytes  107 Mbits/sec    0    482 KBytes
+[  5]   4.00-5.00   sec  12.88 MBytes  108 Mbits/sec    0    543 KBytes
+[  5]   5.00-6.00   sec  12.62 MBytes  106 Mbits/sec    0    600 KBytes
+[  5]   6.00-7.00   sec  12.75 MBytes  107 Mbits/sec    0    658 KBytes
+[  5]   7.00-8.00   sec  12.88 MBytes  108 Mbits/sec    0    717 KBytes
+[  5]   8.00-9.00   sec  12.62 MBytes  106 Mbits/sec    0    775 KBytes
+[  5]   9.00-10.00  sec  12.75 MBytes  107 Mbits/sec    0    831 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec  127 MBytes   107 Mbits/sec    0             sender
+[  5]   0.00-10.67  sec  123 MBytes   103 Mbits/sec                  receiver
+
+iperf Done.
+```
+
+This shows the bandwidth between the two hosts. This is done for all hosts on the network. This will ensure that all hosts are reachable and the bandwidth is correct. This completes task 9.
+\
+For task 10 we need to identify a high latency link for this I chose `LOND -> BOST` as it has a high latency. This completes task 10.
+
+## Task 11
+
+### Objective
+
+Plan a cost sheet for the `OSPF` network.
+
+### Configuration
